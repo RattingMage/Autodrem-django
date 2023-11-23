@@ -33,9 +33,9 @@ class ProfileView(generics.RetrieveUpdateDestroyAPIView):
     queryset = USER_MODEL.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
-    @method_decorator(ensure_csrf_cookie)
-    def dispatch(self, *args, **kwargs) -> Response:
-        return super().dispatch(*args, **kwargs)
+    # @method_decorator(ensure_csrf_cookie)
+    # def dispatch(self, *args, **kwargs) -> Response:
+    #     return super().dispatch(*args, **kwargs)
 
     def get_object(self):
         return self.request.user
