@@ -16,9 +16,9 @@ class Spare(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    in_stock = models.BooleanField()
+    in_stock = models.BooleanField(default=False)
     category = models.CharField(choices=SpareCategory)
-    image = models.ImageField(upload_to='spares/', blank=True)
+    image = models.ImageField(upload_to='spares/', blank=True, null=True)
 
 
 class Service(models.Model):
@@ -47,7 +47,7 @@ class OrderItem(models.Model):
 
 class RepairRequest(models.Model):
     problem = models.TextField()
-    execution_deadline = models.DateField()
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    execution_deadline = models.DateField(null=True, blank=True)
+    cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     employees = models.ManyToManyField(Employee, related_name='repair_requests', blank=True)
     services = models.ManyToManyField(Service, related_name='repair_requests', blank=True)

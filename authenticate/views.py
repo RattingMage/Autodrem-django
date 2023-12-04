@@ -38,7 +38,9 @@ class ProfileView(generics.RetrieveUpdateDestroyAPIView):
     #     return super().dispatch(*args, **kwargs)
 
     def get_object(self):
-        return self.request.user
+        user = self.request.user
+        user_with_cars = USER_MODEL.objects.prefetch_related('car').get(pk=user.pk)
+        return user_with_cars
 
     def delete(self, request, *args, **kwargs):
         logout(request)
@@ -56,6 +58,13 @@ class UpdatePasswordView(generics.UpdateAPIView):
 class CarListCreateView(generics.ListCreateAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        car_instance = serializer.save()
+
+        self.request.user.car = car_instance
+        self.request.user.save()
 
 
 class CarDetailView(generics.RetrieveUpdateDestroyAPIView):

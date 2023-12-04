@@ -51,21 +51,27 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         if not (user := authenticate(
-            username=validated_data['username'],
-            password=validated_data['password']
+                username=validated_data['username'],
+                password=validated_data['password']
         )):
             raise AuthenticationFailed
         return user
 
     class Meta:
-        model=USER_MODEL
-        fields='__all__'
+        model = USER_MODEL
+        fields = '__all__'
+
+
+class CarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = '__all__'
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = USER_MODEL
-        fields = ("id", "username", "first_name", "last_name", "email")
+        fields = ("id", "username", "first_name", "last_name", "email", "car")
 
 
 class UpdatePasswordSerializer(serializers.Serializer):
@@ -87,9 +93,3 @@ class UpdatePasswordSerializer(serializers.Serializer):
         instance.password = make_password(validated_data['new_password'])
         instance.save(update_fields=('password',))
         return instance
-
-
-class CarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Car
-        fields = '__all__'
