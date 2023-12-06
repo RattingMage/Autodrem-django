@@ -71,7 +71,7 @@ class CarSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = USER_MODEL
-        fields = ("id", "username", "first_name", "last_name", "email", "car")
+        fields = ("id", "username", "first_name", "last_name", "email", "car", "is_staff")
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model, login, logout
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
+import logging
 from rest_framework import generics, permissions, status
 
 from authenticate.models import Car
@@ -10,11 +9,17 @@ from rest_framework.response import Response
 
 USER_MODEL = get_user_model()
 
+logger = logging.getLogger("main")
+
 
 class RegistrationView(generics.CreateAPIView):
     model = USER_MODEL
     permission_classes = [permissions.AllowAny]
     serializer_class = RegistrationSerializer
+
+    def post(self, request, *args, **kwargs):
+        logger.debug("registration request")
+        return super().post(request, *args, **kwargs)
 
 
 class LoginView(generics.CreateAPIView):
@@ -25,6 +30,7 @@ class LoginView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         login(request=request, user=user)
+        logger.debug("authorization request")
         return Response(serializer.data)
 
 
@@ -40,10 +46,12 @@ class ProfileView(generics.RetrieveUpdateDestroyAPIView):
     def get_object(self):
         user = self.request.user
         user_with_cars = USER_MODEL.objects.prefetch_related('car').get(pk=user.pk)
+        logger.debug("login request")
         return user_with_cars
 
     def delete(self, request, *args, **kwargs):
         logout(request)
+        logger.debug("logout request")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -65,6 +73,8 @@ class CarListCreateView(generics.ListCreateAPIView):
 
         self.request.user.car = car_instance
         self.request.user.save()
+
+        logger.debug("add car request")
 
 
 class CarDetailView(generics.RetrieveUpdateDestroyAPIView):
