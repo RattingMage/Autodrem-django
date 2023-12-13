@@ -30,6 +30,5 @@ urlpatterns = [
     path('repair-requests/', RepairRequestListCreateView.as_view(), name='repair-request-list'),
     path('repair-requests/<int:pk>/', RepairRequestDetailView.as_view(), name='repair-request-detail'),
 
-    path('admin/order-status-graph/', admin_site.admin_view(admin_site.order_status_graph), name='order_status_graph'),
-
+    # path('admin/order-status-graph/', admin_site.admin_view(admin_site.order_status_graph), name='order_status_graph'),
 ]
