@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'service',
     'authenticate',
+    'django_archive',
 ]
 
 MIDDLEWARE = [
@@ -164,7 +165,8 @@ REST_FRAMEWORK = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+     'http://localhost:3000',
+     'http://localhost:8000',
 ]
 
 LOGGING = {

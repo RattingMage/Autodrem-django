@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model, login, logout
 import logging
 from rest_framework import generics, permissions, status
-
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import connection, transaction
+from authenticate.forms import SQLImportForm
 from authenticate.models import Car
 from authenticate.serializers import RegistrationSerializer, LoginSerializer, UserSerializer, UpdatePasswordSerializer, \
     CarSerializer
@@ -26,10 +29,11 @@ class LoginView(generics.CreateAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        login(request=request, user=user)
+        with transaction.atomic():
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save()
+            login(request=request, user=user)
         logger.debug("authorization request")
         return Response(serializer.data)
 
@@ -80,3 +84,22 @@ class CarListCreateView(generics.ListCreateAPIView):
 class CarDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+
+
+def import_sql_data(request):
+    if request.method == 'POST':
+        form = SQLImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            file_content = request.FILES['file'].read().decode('utf-8')
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(file_content)
+            except Exception as e:
+                messages.error(request, f"Ошибка выполнения SQL-запросов: {e}")
+            else:
+                messages.success(request, "Данные успешно импортированы.")
+                return redirect('admin:authenticate_car_changelist')
+    else:
+        form = SQLImportForm()
+
+    return render(request, 'admin/import_sql_data.html', {'form': form})

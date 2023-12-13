@@ -39,6 +39,7 @@ class Order(models.Model):
                              verbose_name='Пользователь', related_name='orders', default=None)
     repair_request = models.OneToOneField('RepairRequest', related_name='order', on_delete=models.CASCADE, null=True,
                                           blank=True)
+    status_chart = models.ImageField(upload_to='order_status_charts/', blank=True, null=True)
 
 
 class OrderItem(models.Model):
