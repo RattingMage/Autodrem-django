@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -87,3 +88,7 @@ class RepairRequestListCreateView(generics.ListCreateAPIView):
 class RepairRequestDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = RepairRequest.objects.all()
     serializer_class = RepairRequestSerializer
+
+
+def order_status_graph(request):
+    return render(request, 'admin/order-status-graph.html')
