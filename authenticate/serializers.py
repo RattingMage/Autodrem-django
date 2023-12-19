@@ -4,7 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, AuthenticationFailed, NotAuthenticated
 
-from authenticate.models import Car
+from authenticate.models import Car, Employee
 
 USER_MODEL = get_user_model()
 
@@ -68,10 +68,18 @@ class CarSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class EmployeeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
+    cars = CarSerializer(many=True, read_only=True)
+
     class Meta:
         model = USER_MODEL
-        fields = ("id", "username", "first_name", "last_name", "email", "car", "is_staff")
+        fields = ("id", "username", "first_name", "last_name", "email", "cars", "is_staff")
 
 
 class UpdatePasswordSerializer(serializers.Serializer):

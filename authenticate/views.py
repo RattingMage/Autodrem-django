@@ -5,9 +5,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection, transaction
 from authenticate.forms import SQLImportForm
-from authenticate.models import Car
+from authenticate.models import Car, Employee
 from authenticate.serializers import RegistrationSerializer, LoginSerializer, UserSerializer, UpdatePasswordSerializer, \
-    CarSerializer
+    CarSerializer, EmployeeSerializer
 from rest_framework.response import Response
 
 USER_MODEL = get_user_model()
@@ -47,11 +47,15 @@ class ProfileView(generics.RetrieveUpdateDestroyAPIView):
     # def dispatch(self, *args, **kwargs) -> Response:
     #     return super().dispatch(*args, **kwargs)
 
+    # def get_object(self):
+    #     user = self.request.user
+    #     user_with_cars = USER_MODEL.objects.prefetch_related('car').get(pk=user.pk)
+    #     logger.debug("login request")
+    #     return user_with_cars
+
     def get_object(self):
         user = self.request.user
-        user_with_cars = USER_MODEL.objects.prefetch_related('car').get(pk=user.pk)
-        logger.debug("login request")
-        return user_with_cars
+        return USER_MODEL.objects.get(pk=user.pk)
 
     def delete(self, request, *args, **kwargs):
         logout(request)
@@ -74,8 +78,7 @@ class CarListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         car_instance = serializer.save()
-
-        self.request.user.car = car_instance
+        self.request.user.cars.add(car_instance)
         self.request.user.save()
 
         logger.debug("add car request")
@@ -103,3 +106,13 @@ def import_sql_data(request):
         form = SQLImportForm()
 
     return render(request, 'admin/import_sql_data.html', {'form': form})
+
+
+class EmployeeListCreateView(generics.ListCreateAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+
+class EmployeeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer

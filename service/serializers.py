@@ -15,6 +15,9 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    service = ServiceSerializer()
+    spare = SpareSerializer()
+
     class Meta:
         model = OrderItem
         fields = '__all__'
